@@ -1,0 +1,13 @@
+[project]
+name = "pynative"
+version = "0.1.0"
+description = "A small tree-walk interpreter"
+requires-python = ">=3.11"
+
+[project.scripts]
+pynative = "pynative.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["-q"]
+

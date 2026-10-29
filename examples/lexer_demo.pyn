@@ -1,0 +1,5 @@
+// Day 1 lexer demonstration
+let value = 42;
+if (value >= 10 && value != 0) {
+    print("value is valid");
+}
