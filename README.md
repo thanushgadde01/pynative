@@ -2,7 +2,7 @@
 
 PyNative is a minimal tree-walk interpreter, built incrementally.
 
-## Day 1: Lexer
+## Days 1–2: Lexer and expression parser
 
 The first milestone provides a typed, location-aware lexer for the C-like v0.1
 syntax. It supports identifiers, integers and floats, strings with common
@@ -19,4 +19,14 @@ Inspect a source file's tokens:
 
 ```powershell
 python -m pynative.cli .\example.pyn
+```
+
+Day 2 adds a recursive-descent parser for expressions. It handles parentheses,
+unary `!`/`-`, arithmetic, comparisons, equality, and `&&`/`||` with
+conventional precedence and left associativity.
+
+Print an expression AST in prefix notation:
+
+```powershell
+python -m pynative.cli --ast .\examples\expression.pyn
 ```
