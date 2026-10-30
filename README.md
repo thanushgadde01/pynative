@@ -93,8 +93,13 @@ python -m pytest
   primitive type-annotation syntax, first-order type variables, and a lazy
   specialization cache that produces stable names such as `id_int` and
   `id_string`. Existing untyped function syntax remains valid.
-- [ ] **Phase 3: MLIR Lowering** — Emit verified MLIR text from the typed AST
-  using arithmetic, control-flow, function, and memory dialect operations.
+- [x] **Phase 3: MLIR Lowering** — Added deterministic MLIR text emission from
+  the typed AST with `func`, `arith`, and `scf` structure, stable SSA names,
+  primitive constants, arithmetic, functions, and conditionals. The backend
+  has no runtime dependency; `mlir-opt` can be used externally when installed
+  (not available in this environment).
+- [ ] **Phase 4: LLVM & Native Code Generation** — Add MLIR-to-LLVM translation
+  and a native executable pipeline with toolchain detection.
 
 The current frontend intentionally uses an internal `unknown` type for
 unannotated function parameters because the Day 7 grammar has no type
