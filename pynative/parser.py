@@ -5,7 +5,20 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from .ast_nodes import BinaryExpr, Expression, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr
+from .ast_nodes import (
+    AssignStmt,
+    BinaryExpr,
+    Expression,
+    ExpressionStmt,
+    GroupingExpr,
+    LetStmt,
+    LiteralExpr,
+    PrintStmt,
+    Program,
+    Statement,
+    UnaryExpr,
+    VariableExpr,
+)
 from .tokens import Token, TokenType
 
 
@@ -33,6 +46,36 @@ class Parser:
         if not self._is_at_end():
             raise ParseError("Expected end of expression", self._peek())
         return expression
+
+    def parse_program(self) -> Program:
+        """Parse every statement in a source file."""
+        statements: list[Statement] = []
+        while not self._is_at_end():
+            statements.append(self._statement())
+        return Program(tuple(statements))
+
+    def _statement(self) -> Statement:
+        if self._match(TokenType.LET):
+            name = self._consume(TokenType.IDENTIFIER, "Expected variable name after 'let'")
+            self._consume(TokenType.EQUAL, "Expected '=' after variable name")
+            initializer = self._or()
+            self._consume(TokenType.SEMICOLON, "Expected ';' after variable declaration")
+            return LetStmt(name, initializer)
+        if self._match(TokenType.PRINT):
+            self._consume(TokenType.LEFT_PAREN, "Expected '(' after 'print'")
+            expression = self._or()
+            self._consume(TokenType.RIGHT_PAREN, "Expected ')' after print value")
+            self._consume(TokenType.SEMICOLON, "Expected ';' after print statement")
+            return PrintStmt(expression)
+        if self._check(TokenType.IDENTIFIER) and self._check_next(TokenType.EQUAL):
+            name = self._advance()
+            self._advance()
+            value = self._or()
+            self._consume(TokenType.SEMICOLON, "Expected ';' after assignment")
+            return AssignStmt(name, value)
+        expression = self._or()
+        self._consume(TokenType.SEMICOLON, "Expected ';' after expression")
+        return ExpressionStmt(expression)
 
     def _or(self) -> Expression:
         return self._binary(self._and, TokenType.OR_OR)
@@ -102,6 +145,9 @@ class Parser:
 
     def _check(self, token_type: TokenType) -> bool:
         return not self._is_at_end() and self._peek().type == token_type
+
+    def _check_next(self, token_type: TokenType) -> bool:
+        return self.current + 1 < len(self.tokens) and self.tokens[self.current + 1].type == token_type
 
     def _advance(self) -> Token:
         if not self._is_at_end():

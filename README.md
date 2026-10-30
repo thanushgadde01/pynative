@@ -37,3 +37,9 @@ The tree-walk interpreter now evaluates literals, grouping, unary expressions,
 arithmetic, comparisons, equality, boolean operations, and string
 concatenation. It detects undefined variables, invalid numeric operands, and
 division by zero with source locations.
+
+## Day 4: Variables and simple statements
+
+Programs now support `let name = expression;`, reassignment, expression
+statements, and `print(expression);`. A program uses one global environment;
+assigning an undeclared variable is a runtime error.

@@ -47,3 +47,43 @@ class BinaryExpr:
 
 
 Expression: TypeAlias = LiteralExpr | VariableExpr | GroupingExpr | UnaryExpr | BinaryExpr
+
+
+@dataclass(frozen=True, slots=True)
+class LetStmt:
+    """A variable declaration with an initializer."""
+
+    name: Token
+    initializer: Expression
+
+
+@dataclass(frozen=True, slots=True)
+class AssignStmt:
+    """An update to an existing variable."""
+
+    name: Token
+    value: Expression
+
+
+@dataclass(frozen=True, slots=True)
+class PrintStmt:
+    """A call to the built-in print statement."""
+
+    expression: Expression
+
+
+@dataclass(frozen=True, slots=True)
+class ExpressionStmt:
+    """An expression evaluated for its side effects."""
+
+    expression: Expression
+
+
+Statement: TypeAlias = LetStmt | AssignStmt | PrintStmt | ExpressionStmt
+
+
+@dataclass(frozen=True, slots=True)
+class Program:
+    """The root node for a sequence of statements."""
+
+    statements: tuple[Statement, ...]

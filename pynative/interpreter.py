@@ -4,7 +4,20 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from .ast_nodes import BinaryExpr, Expression, GroupingExpr, LiteralExpr, UnaryExpr, VariableExpr
+from .ast_nodes import (
+    AssignStmt,
+    BinaryExpr,
+    Expression,
+    ExpressionStmt,
+    GroupingExpr,
+    LetStmt,
+    LiteralExpr,
+    PrintStmt,
+    Program,
+    Statement,
+    UnaryExpr,
+    VariableExpr,
+)
 from .tokens import Token, TokenType
 
 Value = bool | float | int | str | None
@@ -26,6 +39,26 @@ class Interpreter:
     """Evaluate PyNative expression trees using a global environment."""
 
     environment: dict[str, Value] = field(default_factory=dict)
+    output: list[str] = field(default_factory=list)
+
+    def execute(self, program: Program) -> None:
+        """Execute a complete program in the current global environment."""
+        for statement in program.statements:
+            self.execute_statement(statement)
+
+    def execute_statement(self, statement: Statement) -> None:
+        """Execute one statement."""
+        match statement:
+            case LetStmt(name, initializer):
+                self.environment[name.lexeme] = self.evaluate(initializer)
+            case AssignStmt(name, value):
+                if name.lexeme not in self.environment:
+                    raise RuntimeError(f"Undefined variable '{name.lexeme}'", name)
+                self.environment[name.lexeme] = self.evaluate(value)
+            case PrintStmt(expression):
+                self.output.append(self._display(self.evaluate(expression)))
+            case ExpressionStmt(expression):
+                self.evaluate(expression)
 
     def evaluate(self, expression: Expression) -> Value:
         """Evaluate one expression and return its runtime value."""
