@@ -98,8 +98,13 @@ python -m pytest
   primitive constants, arithmetic, functions, and conditionals. The backend
   has no runtime dependency; `mlir-opt` can be used externally when installed
   (not available in this environment).
-- [ ] **Phase 4: LLVM & Native Code Generation** — Add MLIR-to-LLVM translation
-  and a native executable pipeline with toolchain detection.
+- [x] **Phase 4: LLVM & Native Code Generation** — Added LLVM IR emission for
+  the initial integer subset and `compile_native`, which writes `.ll`, invokes
+  `clang -O3`, and surfaces unavailable-toolchain or compiler errors explicitly.
+  Native compilation remains optional because this Windows environment has no
+  `clang` installed.
+- [ ] **Phase 5: Optimization & Final Features** — Add optimization controls,
+  deterministic resource-management hooks, benchmarking, and CI coverage.
 
 The current frontend intentionally uses an internal `unknown` type for
 unannotated function parameters because the Day 7 grammar has no type
