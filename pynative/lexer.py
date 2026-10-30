@@ -26,6 +26,7 @@ SINGLE_CHARACTER_TOKENS: Final = {
     "}": TokenType.RIGHT_BRACE,
     ",": TokenType.COMMA,
     ";": TokenType.SEMICOLON,
+    ":": TokenType.COLON,
     "+": TokenType.PLUS,
     "-": TokenType.MINUS,
     "*": TokenType.STAR,

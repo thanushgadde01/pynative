@@ -89,8 +89,12 @@ python -m pytest
 - [x] **Phase 1 validation** — Arithmetic, conditionals, functions, string
   concatenation, invalid operands, and invalid conditions are covered by
   semantic tests; the complete suite passes with **33 tests passed**.
-- [ ] **Phase 2: Type Inference & Generics** — Add type variables, unification,
-  parametric polymorphism, and lazy monomorphization for generic functions.
+- [x] **Phase 2: Type Inference & Generics** — Added generic function and
+  primitive type-annotation syntax, first-order type variables, and a lazy
+  specialization cache that produces stable names such as `id_int` and
+  `id_string`. Existing untyped function syntax remains valid.
+- [ ] **Phase 3: MLIR Lowering** — Emit verified MLIR text from the typed AST
+  using arithmetic, control-flow, function, and memory dialect operations.
 
 The current frontend intentionally uses an internal `unknown` type for
 unannotated function parameters because the Day 7 grammar has no type

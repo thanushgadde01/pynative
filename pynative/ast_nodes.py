@@ -111,6 +111,9 @@ class FunctionStmt:
     name: Token
     parameters: tuple[Token, ...]
     body: BlockStmt
+    type_parameters: tuple[Token, ...] = ()
+    parameter_types: tuple[Token | None, ...] = ()
+    return_type: Token | None = None
 
 
 @dataclass(frozen=True, slots=True)

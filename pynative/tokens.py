@@ -28,6 +28,7 @@ class TokenType(Enum):
     RIGHT_BRACE = auto()
     COMMA = auto()
     SEMICOLON = auto()
+    COLON = auto()
 
     PLUS = auto()
     MINUS = auto()
@@ -54,4 +55,3 @@ class Token:
     literal: Any
     line: int
     column: int
-

@@ -62,16 +62,43 @@ class Parser:
     def _statement(self) -> Statement:
         if self._match(TokenType.FUNC):
             name = self._consume(TokenType.IDENTIFIER, "Expected function name after 'func'")
+            type_parameters: list[Token] = []
+            if self._match(TokenType.LESS):
+                while True:
+                    type_parameters.append(
+                        self._consume(TokenType.IDENTIFIER, "Expected type parameter")
+                    )
+                    if not self._match(TokenType.COMMA):
+                        break
+                self._consume(TokenType.GREATER, "Expected '>' after type parameters")
             self._consume(TokenType.LEFT_PAREN, "Expected '(' after function name")
             parameters: list[Token] = []
+            parameter_types: list[Token | None] = []
             if not self._check(TokenType.RIGHT_PAREN):
                 while True:
-                    parameters.append(self._consume(TokenType.IDENTIFIER, "Expected parameter name"))
+                    parameters.append(
+                        self._consume(TokenType.IDENTIFIER, "Expected parameter name")
+                    )
+                    parameter_types.append(
+                        self._consume_type_name()
+                        if self._match(TokenType.COLON)
+                        else None
+                    )
                     if not self._match(TokenType.COMMA):
                         break
             self._consume(TokenType.RIGHT_PAREN, "Expected ')' after parameters")
+            return_type = (
+                self._consume_type_name() if self._match(TokenType.COLON) else None
+            )
             body = self._block("Expected '{' before function body")
-            return FunctionStmt(name, tuple(parameters), body)
+            return FunctionStmt(
+                name,
+                tuple(parameters),
+                body,
+                tuple(type_parameters),
+                tuple(parameter_types),
+                return_type,
+            )
         if self._match(TokenType.RETURN):
             keyword = self._previous()
             value = None if self._check(TokenType.SEMICOLON) else self._or()
@@ -191,6 +218,9 @@ class Parser:
         if self._check(token_type):
             return self._advance()
         raise ParseError(message, self._peek())
+
+    def _consume_type_name(self) -> Token:
+        return self._consume(TokenType.IDENTIFIER, "Expected type name")
 
     def _match(self, *types: TokenType) -> bool:
         for token_type in types:
