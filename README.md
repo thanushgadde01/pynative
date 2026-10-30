@@ -30,3 +30,10 @@ Print an expression AST in prefix notation:
 ```powershell
 python -m pynative.cli --ast .\examples\expression.pyn
 ```
+
+## Day 3: Expression evaluation
+
+The tree-walk interpreter now evaluates literals, grouping, unary expressions,
+arithmetic, comparisons, equality, boolean operations, and string
+concatenation. It detects undefined variables, invalid numeric operands, and
+division by zero with source locations.
