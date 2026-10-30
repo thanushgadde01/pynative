@@ -9,14 +9,17 @@ from .ast_nodes import (
     AssignStmt,
     BinaryExpr,
     BlockStmt,
+    CallExpr,
     Expression,
     ExpressionStmt,
     GroupingExpr,
+    FunctionStmt,
     IfStmt,
     LetStmt,
     LiteralExpr,
     PrintStmt,
     Program,
+    ReturnStmt,
     Statement,
     UnaryExpr,
     VariableExpr,
@@ -57,6 +60,23 @@ class Parser:
         return Program(tuple(statements))
 
     def _statement(self) -> Statement:
+        if self._match(TokenType.FUNC):
+            name = self._consume(TokenType.IDENTIFIER, "Expected function name after 'func'")
+            self._consume(TokenType.LEFT_PAREN, "Expected '(' after function name")
+            parameters: list[Token] = []
+            if not self._check(TokenType.RIGHT_PAREN):
+                while True:
+                    parameters.append(self._consume(TokenType.IDENTIFIER, "Expected parameter name"))
+                    if not self._match(TokenType.COMMA):
+                        break
+            self._consume(TokenType.RIGHT_PAREN, "Expected ')' after parameters")
+            body = self._block("Expected '{' before function body")
+            return FunctionStmt(name, tuple(parameters), body)
+        if self._match(TokenType.RETURN):
+            keyword = self._previous()
+            value = None if self._check(TokenType.SEMICOLON) else self._or()
+            self._consume(TokenType.SEMICOLON, "Expected ';' after return value")
+            return ReturnStmt(keyword, value)
         if self._match(TokenType.IF):
             self._consume(TokenType.LEFT_PAREN, "Expected '(' after 'if'")
             condition = self._or()
@@ -65,11 +85,7 @@ class Parser:
             else_branch = self._statement() if self._match(TokenType.ELSE) else None
             return IfStmt(condition, then_branch, else_branch)
         if self._match(TokenType.LEFT_BRACE):
-            statements: list[Statement] = []
-            while not self._check(TokenType.RIGHT_BRACE) and not self._is_at_end():
-                statements.append(self._statement())
-            self._consume(TokenType.RIGHT_BRACE, "Expected '}' after block")
-            return BlockStmt(tuple(statements))
+            return self._finish_block()
         if self._match(TokenType.LET):
             name = self._consume(TokenType.IDENTIFIER, "Expected variable name after 'let'")
             self._consume(TokenType.EQUAL, "Expected '=' after variable name")
@@ -91,6 +107,17 @@ class Parser:
         expression = self._or()
         self._consume(TokenType.SEMICOLON, "Expected ';' after expression")
         return ExpressionStmt(expression)
+
+    def _block(self, opening_message: str) -> BlockStmt:
+        self._consume(TokenType.LEFT_BRACE, opening_message)
+        return self._finish_block()
+
+    def _finish_block(self) -> BlockStmt:
+        statements: list[Statement] = []
+        while not self._check(TokenType.RIGHT_BRACE) and not self._is_at_end():
+            statements.append(self._statement())
+        self._consume(TokenType.RIGHT_BRACE, "Expected '}' after block")
+        return BlockStmt(tuple(statements))
 
     def _or(self) -> Expression:
         return self._binary(self._and, TokenType.OR_OR)
@@ -129,7 +156,21 @@ class Parser:
         if self._match(TokenType.BANG, TokenType.MINUS):
             operator = self._previous()
             return UnaryExpr(operator, self._unary())
-        return self._primary()
+        return self._call()
+
+    def _call(self) -> Expression:
+        expression = self._primary()
+        while self._match(TokenType.LEFT_PAREN):
+            paren = self._previous()
+            arguments: list[Expression] = []
+            if not self._check(TokenType.RIGHT_PAREN):
+                while True:
+                    arguments.append(self._or())
+                    if not self._match(TokenType.COMMA):
+                        break
+            self._consume(TokenType.RIGHT_PAREN, "Expected ')' after arguments")
+            expression = CallExpr(expression, paren, tuple(arguments))
+        return expression
 
     def _primary(self) -> Expression:
         if self._match(TokenType.FALSE):

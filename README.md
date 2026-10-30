@@ -49,3 +49,8 @@ assigning an undeclared variable is a runtime error.
 The language now supports `if (condition) statement` with optional `else`
 branches and brace-delimited blocks. Conditions use the interpreter's boolean
 truthiness rules.
+
+## Day 6: Functions and returns
+
+The interpreter supports named functions, parameters, calls, local parameter
+scopes, recursion, and `return`. Function calls validate argument counts.

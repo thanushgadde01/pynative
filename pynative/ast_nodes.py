@@ -46,7 +46,16 @@ class BinaryExpr:
     right: Expression
 
 
-Expression: TypeAlias = LiteralExpr | VariableExpr | GroupingExpr | UnaryExpr | BinaryExpr
+@dataclass(frozen=True, slots=True)
+class CallExpr:
+    """A function call with evaluated argument expressions."""
+
+    callee: Expression
+    paren: Token
+    arguments: tuple[Expression, ...]
+
+
+Expression: TypeAlias = LiteralExpr | VariableExpr | GroupingExpr | UnaryExpr | BinaryExpr | CallExpr
 
 
 @dataclass(frozen=True, slots=True)
@@ -95,7 +104,24 @@ class IfStmt:
     else_branch: Statement | None
 
 
-Statement: TypeAlias = LetStmt | AssignStmt | PrintStmt | ExpressionStmt | BlockStmt | IfStmt
+@dataclass(frozen=True, slots=True)
+class FunctionStmt:
+    """A named function declaration."""
+
+    name: Token
+    parameters: tuple[Token, ...]
+    body: BlockStmt
+
+
+@dataclass(frozen=True, slots=True)
+class ReturnStmt:
+    """Exit the enclosing function with an optional value."""
+
+    keyword: Token
+    value: Expression | None
+
+
+Statement: TypeAlias = LetStmt | AssignStmt | PrintStmt | ExpressionStmt | BlockStmt | IfStmt | FunctionStmt | ReturnStmt
 
 
 @dataclass(frozen=True, slots=True)
