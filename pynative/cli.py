@@ -1,19 +1,22 @@
-"""Command-line entry point for inspecting PyNative source tokens."""
+"""Command-line entry point for running and inspecting PyNative source."""
 
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
 
+from .interpreter import Interpreter, RuntimeError
 from .lexer import Lexer, LexerError
 from .parser import ParseError, Parser
 
 
 def main() -> int:
-    """Tokenize a source file and print one token per line."""
-    parser = argparse.ArgumentParser(description="Inspect a PyNative expression.")
+    """Run a source program, or inspect its tokens or expression tree."""
+    parser = argparse.ArgumentParser(description="Run or inspect a PyNative source file.")
     parser.add_argument("source", type=Path, help="Path to the source file")
-    parser.add_argument("--ast", action="store_true", help="Print the parsed expression tree")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--tokens", action="store_true", help="Print lexical tokens")
+    mode.add_argument("--ast", action="store_true", help="Print a parsed expression tree")
     arguments = parser.parse_args()
 
     try:
@@ -24,6 +27,11 @@ def main() -> int:
     except LexerError as error:
         parser.error(str(error))
 
+    if arguments.tokens:
+        for token in tokens:
+            print(f"{token.line}:{token.column}\t{token.type.name}\t{token.lexeme!r}\t{token.literal!r}")
+        return 0
+
     if arguments.ast:
         try:
             from .ast_printer import format_expression
@@ -33,8 +41,13 @@ def main() -> int:
         except ParseError as error:
             parser.error(str(error))
 
-    for token in tokens:
-        print(f"{token.line}:{token.column}\t{token.type.name}\t{token.lexeme!r}\t{token.literal!r}")
+    try:
+        interpreter = Interpreter()
+        interpreter.execute(Parser(tokens).parse_program())
+    except (ParseError, RuntimeError) as error:
+        parser.error(str(error))
+    for line in interpreter.output:
+        print(line)
     return 0
 
 

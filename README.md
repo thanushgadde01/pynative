@@ -1,6 +1,6 @@
 # PyNative
 
-PyNative is a minimal tree-walk interpreter, built incrementally.
+PyNative is a minimal tree-walk interpreter for a small C-like language.
 
 ## Days 1–2: Lexer and expression parser
 
@@ -18,7 +18,7 @@ python -m pytest
 Inspect a source file's tokens:
 
 ```powershell
-python -m pynative.cli .\example.pyn
+python -m pynative.cli --tokens .\examples\lexer_demo.pyn
 ```
 
 Day 2 adds a recursive-descent parser for expressions. It handles parentheses,
@@ -54,3 +54,26 @@ truthiness rules.
 
 The interpreter supports named functions, parameters, calls, local parameter
 scopes, recursion, and `return`. Function calls validate argument counts.
+
+## Day 7: Script runner and capstone
+
+The CLI now runs complete `.pyn` programs by default. The capstone program
+demonstrates variables, functions, recursion, conditionals, arithmetic, and
+output:
+
+```powershell
+python -m pynative.cli .\examples\capstone.pyn
+```
+
+Expected output:
+
+```text
+Sum is: 15
+```
+
+Use `--tokens` to inspect lexical output or `--ast` for a single expression.
+All components are covered by the test suite:
+
+```powershell
+python -m pytest
+```

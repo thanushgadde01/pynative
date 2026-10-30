@@ -1,0 +1,11 @@
+// Computes the sum of numbers 1 through n using recursion.
+func sum_to(n) {
+    if (n <= 0) {
+        return 0;
+    } else {
+        return n + sum_to(n - 1);
+    }
+}
+
+let result = sum_to(5);
+print("Sum is: " + result);
