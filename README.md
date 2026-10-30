@@ -77,3 +77,22 @@ All components are covered by the test suite:
 ```powershell
 python -m pytest
 ```
+
+## Progress / Implementation Status
+
+- [x] **Phase 1: Frontend & Typed AST** — Added `pynative.semantic` with
+  lexical-scope symbol resolution, primitive type inference, function
+  signatures, return checking, and source-location-aware semantic errors.
+  `TypedProgram` keeps inferred expression and declaration types alongside the
+  existing AST, so the interpreter remains compatible while compiler work
+  begins.
+- [x] **Phase 1 validation** — Arithmetic, conditionals, functions, string
+  concatenation, invalid operands, and invalid conditions are covered by
+  semantic tests; the complete suite passes with **33 tests passed**.
+- [ ] **Phase 2: Type Inference & Generics** — Add type variables, unification,
+  parametric polymorphism, and lazy monomorphization for generic functions.
+
+The current frontend intentionally uses an internal `unknown` type for
+unannotated function parameters because the Day 7 grammar has no type
+annotation syntax. Known primitive expressions are checked statically, while
+the existing interpreter and language syntax remain unchanged.
