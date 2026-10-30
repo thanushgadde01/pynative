@@ -43,3 +43,9 @@ division by zero with source locations.
 Programs now support `let name = expression;`, reassignment, expression
 statements, and `print(expression);`. A program uses one global environment;
 assigning an undeclared variable is a runtime error.
+
+## Day 5: Conditional control flow
+
+The language now supports `if (condition) statement` with optional `else`
+branches and brace-delimited blocks. Conditions use the interpreter's boolean
+truthiness rules.

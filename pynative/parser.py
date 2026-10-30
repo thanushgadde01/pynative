@@ -8,9 +8,11 @@ from dataclasses import dataclass
 from .ast_nodes import (
     AssignStmt,
     BinaryExpr,
+    BlockStmt,
     Expression,
     ExpressionStmt,
     GroupingExpr,
+    IfStmt,
     LetStmt,
     LiteralExpr,
     PrintStmt,
@@ -55,6 +57,19 @@ class Parser:
         return Program(tuple(statements))
 
     def _statement(self) -> Statement:
+        if self._match(TokenType.IF):
+            self._consume(TokenType.LEFT_PAREN, "Expected '(' after 'if'")
+            condition = self._or()
+            self._consume(TokenType.RIGHT_PAREN, "Expected ')' after if condition")
+            then_branch = self._statement()
+            else_branch = self._statement() if self._match(TokenType.ELSE) else None
+            return IfStmt(condition, then_branch, else_branch)
+        if self._match(TokenType.LEFT_BRACE):
+            statements: list[Statement] = []
+            while not self._check(TokenType.RIGHT_BRACE) and not self._is_at_end():
+                statements.append(self._statement())
+            self._consume(TokenType.RIGHT_BRACE, "Expected '}' after block")
+            return BlockStmt(tuple(statements))
         if self._match(TokenType.LET):
             name = self._consume(TokenType.IDENTIFIER, "Expected variable name after 'let'")
             self._consume(TokenType.EQUAL, "Expected '=' after variable name")

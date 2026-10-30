@@ -79,7 +79,23 @@ class ExpressionStmt:
     expression: Expression
 
 
-Statement: TypeAlias = LetStmt | AssignStmt | PrintStmt | ExpressionStmt
+@dataclass(frozen=True, slots=True)
+class BlockStmt:
+    """A brace-delimited sequence of statements."""
+
+    statements: tuple[Statement, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class IfStmt:
+    """A conditional branch, optionally with an else branch."""
+
+    condition: Expression
+    then_branch: Statement
+    else_branch: Statement | None
+
+
+Statement: TypeAlias = LetStmt | AssignStmt | PrintStmt | ExpressionStmt | BlockStmt | IfStmt
 
 
 @dataclass(frozen=True, slots=True)

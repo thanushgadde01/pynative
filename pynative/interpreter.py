@@ -7,9 +7,11 @@ from dataclasses import dataclass, field
 from .ast_nodes import (
     AssignStmt,
     BinaryExpr,
+    BlockStmt,
     Expression,
     ExpressionStmt,
     GroupingExpr,
+    IfStmt,
     LetStmt,
     LiteralExpr,
     PrintStmt,
@@ -59,6 +61,14 @@ class Interpreter:
                 self.output.append(self._display(self.evaluate(expression)))
             case ExpressionStmt(expression):
                 self.evaluate(expression)
+            case BlockStmt(statements):
+                for nested_statement in statements:
+                    self.execute_statement(nested_statement)
+            case IfStmt(condition, then_branch, else_branch):
+                if self._truthy(self.evaluate(condition)):
+                    self.execute_statement(then_branch)
+                elif else_branch is not None:
+                    self.execute_statement(else_branch)
 
     def evaluate(self, expression: Expression) -> Value:
         """Evaluate one expression and return its runtime value."""
