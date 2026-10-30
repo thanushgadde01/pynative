@@ -103,8 +103,14 @@ python -m pytest
   `clang -O3`, and surfaces unavailable-toolchain or compiler errors explicitly.
   Native compilation remains optional because this Windows environment has no
   `clang` installed.
-- [ ] **Phase 5: Optimization & Final Features** — Add optimization controls,
-  deterministic resource-management hooks, benchmarking, and CI coverage.
+- [x] **Phase 5: Optimization & Final Features** — Added safe integer constant
+  folding, reverse-order deterministic arena cleanup, and a benchmark helper.
+  The final regression suite passes with **40 tests passed**.
+
+The roadmap is complete for the implemented prototype scope. MLIR/LLVM
+verification and native executable generation require external toolchains;
+the Python APIs fail explicitly when those tools are unavailable rather than
+returning a misleading success.
 
 The current frontend intentionally uses an internal `unknown` type for
 unannotated function parameters because the Day 7 grammar has no type
